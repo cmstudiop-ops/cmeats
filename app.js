@@ -1,5 +1,5 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase=createClient('https://bmjovjmpogjoerhfgtra.supabase.co','sb_publishable_IopAMkU-6fzz0e-Qps6RTA_5wjXnBPt');
+const supabase=createClient('https://fjttrtxegefejpevdznm.supabase.co','sb_publishable__GG6-AUad9FakXoTu9OyqA__9NCIive');
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'R '+Number(n||0).toFixed(2);
