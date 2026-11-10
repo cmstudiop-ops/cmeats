@@ -1,0 +1,18 @@
+{
+  "name": "CM EATS — Nkomazi Food Delivery",
+  "short_name": "CM EATS",
+  "description": "Nkomazi's food delivery app",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff590c",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
