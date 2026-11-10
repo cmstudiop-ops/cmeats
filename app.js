@@ -77,6 +77,45 @@ else{msg.textContent='Account created. Email verification is currently required 
 };
 $('backToSignIn').onclick=()=>toggleSignup(false);
 $('reset').onclick=async()=>{const email=$('email').value.trim();if(!email){$('authMessage').textContent='Enter your email first.';return}const {error}=await supabase.auth.resetPasswordForEmail(email);$('authMessage').textContent=error?error.message:'If this account exists, a recovery email will be sent.'};
-supabase.auth.onAuthStateChange((_event,s)=>{session=s;if(!$('profile').hidden)renderProfile()});
-(async()=>{const {data}=await supabase.auth.getSession();session=data.session;await loadRestaurants()})();
+// Keep the customer experience synchronized with Supabase Realtime.
+// RLS controls visibility; each signed-in customer only subscribes to their own orders.
+let customerOrdersChannel=null;
+let activeMenuChannel=null;
+let reloadRestaurantsQueued=false;
+let reloadOrdersQueued=false;
+function queueRestaurantsReload(){
+ if(reloadRestaurantsQueued)return;
+ reloadRestaurantsQueued=true;
+ queueMicrotask(async()=>{reloadRestaurantsQueued=false;await loadRestaurants();if(currentRestaurant&&!restaurants.some(r=>r.id===currentRestaurant.id)){currentRestaurant=null;menu=[];cart=[];saveCart();if(!$('restaurant').hidden)go('home')}});
+}
+function queueOrdersReload(){
+ if(reloadOrdersQueued)return;
+ reloadOrdersQueued=true;
+ queueMicrotask(async()=>{reloadOrdersQueued=false;if(!$('orders').hidden)await loadOrders();if(!$('profile').hidden)await renderProfile()});
+}
+const catalogChannel=supabase.channel('cmeats-public-catalog')
+.on('postgres_changes',{event:'*',schema:'public',table:'restaurants'},queueRestaurantsReload)
+.on('postgres_changes',{event:'*',schema:'public',table:'menu_items'},()=>{if(currentRestaurant&&!$('restaurant').hidden)openRestaurant(currentRestaurant.id)})
+.subscribe();
+function subscribeCustomerOrders(){
+ if(customerOrdersChannel){supabase.removeChannel(customerOrdersChannel);customerOrdersChannel=null}
+ if(!session?.user?.id)return;
+ const userId=session.user.id;
+ customerOrdersChannel=supabase.channel('cmeats-customer-orders-'+userId)
+ .on('postgres_changes',{event:'*',schema:'public',table:'orders',filter:'customer_id=eq.'+userId},queueOrdersReload)
+ .subscribe();
+}
+supabase.auth.onAuthStateChange((_event,nextSession)=>{
+ const previousId=session?.user?.id;
+ session=nextSession;
+ if(previousId!==session?.user?.id){
+   // Defer database requests until Supabase finishes the auth callback.
+   setTimeout(()=>{subscribeCustomerOrders();if(!$('orders').hidden)loadOrders();if(!$('profile').hidden)renderProfile()},0);
+ }
+});
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible'){loadRestaurants();if(!$('orders').hidden)loadOrders();if(!$('profile').hidden)renderProfile();if(currentRestaurant&&!$('restaurant').hidden)openRestaurant(currentRestaurant.id)}
+});
+window.addEventListener('online',()=>{loadRestaurants();if(!$('orders').hidden)loadOrders()});
+(async()=>{const {data}=await supabase.auth.getSession();session=data.session;subscribeCustomerOrders();await loadRestaurants()})();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
