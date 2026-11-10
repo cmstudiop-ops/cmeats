@@ -1,5 +1,5 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase=createClient('https://fjttrtxegefejpevdznm.supabase.co','sb_publishable__GG6-AUad9FakXoTu9OyqA__9NCIive');
+const supabase=createClient('https://fjttrtxegefejpevdznm.supabase.co','sb_publishable__GG6-AUad9FakXoTu9OyqA__9NCIive',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'cmeats-customer-session'}});
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'R '+Number(n||0).toFixed(2);
@@ -128,5 +128,5 @@ document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='visible'){loadRestaurants();if(!$('orders').hidden)loadOrders();if(!$('profile').hidden)renderProfile();if(currentRestaurant&&!$('restaurant').hidden)openRestaurant(currentRestaurant.id)}
 });
 window.addEventListener('online',()=>{loadRestaurants();if(!$('orders').hidden)loadOrders()});
-(async()=>{const {data}=await supabase.auth.getSession();session=data.session;subscribeCustomerOrders();await loadRestaurants()})();
+(async()=>{const {data}=await supabase.auth.getSession();session=data.session;if(session?.user){document.getElementById('welcomeIntro')?.remove();document.getElementById('cmLaunch')?.remove();document.documentElement.classList.remove('cm-prelaunch');}else{document.documentElement.classList.remove('cm-auth-checking');}subscribeCustomerOrders();await loadRestaurants()})();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
