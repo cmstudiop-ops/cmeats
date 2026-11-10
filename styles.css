@@ -11,3 +11,22 @@
 .cover-placeholder{font:900 22px Outfit,sans-serif;letter-spacing:-1px;color:#a74e1c}
 #authMessage{min-height:18px}
 button:disabled{opacity:.6;cursor:wait}
+
+/* Refined category illustrations, soft gradients and interaction */
+.category-card{position:relative;overflow:hidden;min-height:120px;border:1px solid #f1e9e3;background:linear-gradient(145deg,#fffaf6 0%,#fff2e8 100%);box-shadow:0 5px 13px #de783d0b;gap:7px}
+.category-card:nth-child(2n){background:linear-gradient(145deg,#fff8ee,#ffe8d6)}
+.category-card:nth-child(3n){background:linear-gradient(145deg,#fff9f5,#ffece4)}
+.category-card:before{content:"";position:absolute;top:-31px;right:-32px;width:78px;height:78px;border-radius:50%;background:#fff8f070}
+.category-card .cat-icon{height:59px;width:65px;border-radius:18px;background:#ffffffb5;box-shadow:0 7px 16px #d9773314;display:grid;place-items:center;position:relative}
+.category-card .cat-icon svg{width:37px;height:37px;stroke-width:1.9;filter:drop-shadow(0 2px 1px #d15b1710)}
+.category-card>span:last-child{position:relative;font:800 12px Outfit,sans-serif}
+.category-card.selected{background:linear-gradient(145deg,#ff8e45,#ff5b17);color:white;border-color:#ff6d22;box-shadow:0 9px 21px #f3642535}
+.category-card.selected .cat-icon{background:#ffffff35;color:white}
+.category-card.selected .cat-icon svg{stroke:white}
+.category-card.selected>span:last-child{color:white}
+.empty-art{display:flex;justify-content:center;margin-bottom:13px}
+.empty-art svg{width:92px;height:92px}
+.hero-cta:hover,.primary:hover{filter:brightness(1.045)}
+.restaurant-card:hover{transform:translateY(-2px);box-shadow:0 13px 28px #19283e13}
+.restaurant-card{transition:transform .2s,box-shadow .2s}
+@media(prefers-reduced-motion:reduce){.restaurant-card,.category-card{transition:none}}
